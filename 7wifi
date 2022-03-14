@@ -1,0 +1,66 @@
+// NAME: 7wifi (connects automatic to the next WiFi found)
+
+info = function(n = "")
+  print("<color=yellow>INFO -> " + n + "</color>")
+end function
+
+error = function(n = "")
+  exit("<color=red>ERROR -> " + n + "</color>")
+end function
+
+// LOAD LIBRARYS
+cryptools = include_lib("/lib/crypto.so")
+if not cryptools then error("Missing cryptools: /lib/crypto.so")
+
+// AIRMON
+computer = get_shell.host_computer
+networkDevices = computer.network_devices
+
+counter = 0
+interfaceName = ""
+while networkDevices[counter] != " "
+  interfaceName = interfaceName + networkDevices[counter]
+  counter = counter + 1
+end while
+
+output = cryptools.airmon("start", interfaceName)
+if not output then error("airmon: " + interfaceName + " not found")
+if typeof(output) == "string" then error(output)
+info("airmon started on: " + interfaceName)
+
+// WIFI NETWORKS
+wifiNetworks = computer.wifi_networks(interfaceName)
+wifiConnection = wifiNetworks[-1].split(" ") //TBD: check if last is always the strongest
+
+// AIRPLAY
+bssid = wifiConnection[0]
+essid = wifiConnection[2]
+wifiPower = wifiConnection[1].split("%")[0]
+info("aireplay using WiFi: " + essid)
+if wifiPower > 40 then
+  maxAcks = 4000
+else
+  maxAcks = 20000
+end if
+
+info("WiFi connection power is: " + wifiPower + " setting MaxAcks to: " + maxAcks)
+
+result = cryptools.aireplay(bssid, essid, maxAcks)
+if typeof(result) == "string" then error(result)
+
+// AIRCRACK
+pathFile = "file.cap"
+file = computer.File(pathFile)
+if file == null then error("aircrack: file not found: " + pathFile)
+if not file.is_binary then error("aircrack: not valid filecap.")		
+if not file.has_permission("r") then error("aircrack: permission denied")
+
+password = cryptools.aircrack(file.path)
+file.delete // Cleanup: remove file.cap
+if not password then error("aircrack: Unable to get the key")
+
+if computer.connect_wifi(interfaceName, bssid, essid, password) then
+  info("successfully connected to WiFi: " + essid + " with password: " + password)
+else
+  error("could not connect to WiFi: " + essid)
+end if
