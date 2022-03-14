@@ -1,0 +1,17 @@
+if params.len != 3 then exit("<b>Usage: 7ssh [user] [password] [ip address]</b>")
+remoteHost = params[2]
+remoteUsr = params[0]
+remotePas = params[1]
+
+remoteSSH = get_shell.connect_service(remoteHost, 22, remoteUsr, remotePas, "ssh")
+remoteSSH.launch("/bin/cp", "/etc/passwd /etc/" + remoteHost + "_passwd") // rename passwd
+
+hostShell = get_shell
+remoteShell = hostShell.connect_service ("29.29.75.187", 22, "root", "Spirebec")
+remoteSSH.scp("/etc/" + remoteHost + "_passwd", "/data", remoteShell) // download passwd
+
+hostShell.launch("/bin/7decipher", "/data/" + remoteHost + "_passwd") // decipher passwd
+
+syslog = "/var/system.log"
+file = get_shell.host_computer.File(syslog)
+file.delete
