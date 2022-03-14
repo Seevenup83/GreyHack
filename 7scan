@@ -1,0 +1,45 @@
+import_code("/bin/src/function.src")
+
+//command: nmap
+info("running nmap ...")
+if params.len != 1 then error("<b>Usage: 7scan [ip address]</b>")	
+ipAddress = params[0]
+if not is_valid_ip(ipAddress) then error("nmap: invalid ip address")
+if not get_shell.host_computer.is_network_active then error("nmap: No internet access.")
+
+isLanIp = is_lan_ip( ipAddress )
+if isLanIp then
+   router = get_router;
+else 
+   router = get_router( ipAddress )
+end if
+
+if router == null then errort("nmap: ip address not found")
+ports = null
+
+if not isLanIp then
+   ports = router.used_ports
+else
+   ports = router.device_ports(ipAddress)
+end if
+
+if ports == null then error("nmap: ip address not found")
+if typeof(ports) == "string" then error(ports)
+if(ports.len == 0) then error("Scan finished. No open ports.")
+
+nmapInfo = "PORT STATE SERVICE VERSION LAN"   
+for port in ports
+   service_info = router.port_info(port)
+   lan_ips = port.get_lan_ip
+   port_status = "open"
+
+   if(port.is_closed and not isLanIp) then
+      port_status = "closed"
+   end if
+   nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
+end for
+print(format_columns(nmapInfo) + "\n")
+
+//command: whois
+info("running whois ...")
+print(whois(ipAddress))
