@@ -1,0 +1,41 @@
+//command: decipher
+import_code("/bin/src/function.src")
+cryptools = include_lib("/lib/crypto.so")
+if not cryptools then error("Error: Missing crypto library")
+if params.len != 1 or params[0] == "-h" or params[0] == "--help" then error(command_info("decipher_usage"))
+computer = get_shell.host_computer
+origFile = params[0]
+file = computer.File(origFile)
+if not file then error("decipher: can't find " + origFile)
+if file.is_binary then error("decipher: can't read " + origFile + ". Binary file")
+if not file.has_permission("r") then error("decipher: can't read file. Permission denied")
+if file.get_content.len == 0 then error("decipher: no users found")
+	
+lines = file.get_content.split("\n")
+password = null
+numLine = 0
+
+
+exportPath = "/tmp"
+exportFile = "export"
+export = exportPath + "/" + exportFile
+content = ""
+
+
+for line in lines
+  if line.len > 0 then
+    userPass = lines[numLine].split(":")
+	numLine = numLine + 1
+    password = GetPassword(userPass)
+    if not password then error("Can't find password")
+
+    file = computer.File(export)
+    if not file then 
+      computer.touch(exportPath, exportFile)
+    else
+	  content = computer.File(export).get_content
+  end if
+  computer.File(export).set_content(content + "\n" + userPass[0] + ":" + password)
+  info("user: " + userPass[0] + " password: " + password)
+  end if
+end for
