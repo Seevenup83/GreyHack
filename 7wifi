@@ -1,14 +1,5 @@
 // NAME: 7wifi (connects automatic to the next WiFi found)
-
-info = function(n = "")
-  print("<color=yellow>INFO -> " + n + "</color>")
-end function
-
-error = function(n = "")
-  exit("<color=red>ERROR -> " + n + "</color>")
-end function
-
-// LOAD LIBRARYS
+import_code("/bin/src/function.src")
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then error("Missing cryptools: /lib/crypto.so")
 
@@ -30,14 +21,28 @@ info("airmon started on: " + interfaceName)
 
 // WIFI NETWORKS
 wifiNetworks = computer.wifi_networks(interfaceName)
-wifiConnection = wifiNetworks[-1].split(" ") //TBD: check if last is always the strongest
+
+counter = 0
+wifiStrong = 0
+print("searching for strongest WiFi-Network ...")
+for wifiNetwork in wifiNetworks
+	wifiConnection = wifiNetworks[counter].split(" ") //TBD: check if last is always the strongest
+	wifiPower = wifiConnection[1].split("%")[0]
+	
+	if wifiPower > wifiStrong then
+	  wifiStrong = wifiPower
+	  bssid = wifiConnection[0]
+      essid = wifiConnection[2]
+	end if
+	counter = counter + 1
+end for
 
 // AIRPLAY
-bssid = wifiConnection[0]
-essid = wifiConnection[2]
 wifiPower = wifiConnection[1].split("%")[0]
 info("aireplay using WiFi: " + essid)
-if wifiPower > 40 then
+if wifiPower > 75 then
+  maxAcks = 3000
+else if wifiPower > 40 then
   maxAcks = 4000
 else
   maxAcks = 20000
