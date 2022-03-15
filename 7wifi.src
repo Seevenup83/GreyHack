@@ -1,7 +1,6 @@
 // NAME: 7wifi (connects automatic to the next WiFi found)
-import_code("/bin/src/7function.src")
 cryptools = include_lib("/lib/crypto.so")
-if not cryptools then error("Missing cryptools: /lib/crypto.so")
+if not cryptools then exit("Missing cryptools: /lib/crypto.so")
 
 // AIRMON
 computer = get_shell.host_computer
@@ -15,9 +14,9 @@ while networkDevices[counter] != " "
 end while
 
 output = cryptools.airmon("start", interfaceName)
-if not output then error("airmon: " + interfaceName + " not found")
+if not output then exit("airmon: " + interfaceName + " not found")
 if typeof(output) == "string" then error(output)
-info("airmon started on: " + interfaceName)
+print("airmon started on: " + interfaceName)
 
 // WIFI NETWORKS
 wifiNetworks = computer.wifi_networks(interfaceName)
@@ -38,7 +37,7 @@ for wifiNetwork in wifiNetworks
 end for
 
 // AIRPLAY
-info("aireplay using WiFi: " + essid)
+print("aireplay using WiFi: " + essid)
 if wifiStrong >= 75 then
   maxAcks = 3000
 else if wifiStrong >= 50 then
@@ -47,24 +46,24 @@ else
   maxAcks = 20000
 end if
 
-info("WiFi connection power is: " + wifiStrong + " setting MaxAcks to: " + maxAcks)
+print("WiFi connection power is: " + wifiStrong + " setting MaxAcks to: " + maxAcks)
 
 result = cryptools.aireplay(bssid, essid, maxAcks)
-if typeof(result) == "string" then error(result)
+if typeof(result) == "string" then exit(result)
 
 // AIRCRACK
 pathFile = "file.cap"
 file = computer.File(pathFile)
-if file == null then error("aircrack: file not found: " + pathFile)
-if not file.is_binary then error("aircrack: not valid filecap.")		
-if not file.has_permission("r") then error("aircrack: permission denied")
+if file == null then exit("aircrack: file not found: " + pathFile)
+if not file.is_binary then exit("aircrack: not valid filecap.")		
+if not file.has_permission("r") then exit("aircrack: permission denied")
 
 password = cryptools.aircrack(file.path)
 file.delete // Cleanup: remove file.cap
-if not password then error("aircrack: Unable to get the key")
+if not password then exit("aircrack: Unable to get the key")
 
 if computer.connect_wifi(interfaceName, bssid, essid, password) then
-  info("successfully connected to WiFi: " + essid + " with password: " + password)
+  print("successfully connected to WiFi: " + essid + " with password: " + password)
 else
-  error("could not connect to WiFi: " + essid)
+  exit("could not connect to WiFi: " + essid)
 end if
