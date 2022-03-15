@@ -1,5 +1,5 @@
 //command: decipher
-import_code("/bin/src/function.src")
+import_code("/bin/src/7function.src")
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then error("Error: Missing crypto library")
 if params.len != 1 or params[0] == "-h" or params[0] == "--help" then error(command_info("decipher_usage"))
@@ -15,7 +15,8 @@ if file.get_content.len == 0 then error("decipher: no users found")
 lines = file.get_content.split("\n")
 password = null
 numLine = 0
-exportPath = "/data"
+userName = active_user
+exportPath = "/home/" + userName + "/Downloads"
 exportFile = file.name
 export = exportPath + "/" + exportFile
 content = ""
