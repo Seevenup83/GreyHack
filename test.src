@@ -1,0 +1,103 @@
+if params.len != 2 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: "+program_path.split("/")[-1]+" [ip_address] [port]</b>")
+metaxploit = include_lib("/lib/metaxploit.so")
+if not metaxploit then
+    metaxploit = include_lib(current_path + "/metaxploit.so")
+end if
+if not metaxploit then exit("Error: Can't find metaxploit library in the /lib path or the current folder")
+address = params[0]
+port = params[1].to_int
+net_session = metaxploit.net_use( address, port )
+if not net_session then exit("Error: can't connect to net session")
+metaLib = net_session.dump_lib
+result = metaLib.overflow("0x592C1744", "atus")
+if not result then exit("Program ended")
+cryptools = include_lib("/lib/crypto.so")
+if not cryptools then
+	cryptools = include_lib(current_path + "/crypto.so")
+end if
+if not cryptools then exit("Error: Can't find crypto.so library in the /lib path or the current folder")
+
+GetPassword = function(userPass)
+  if userPass.len != 2 then 
+    print("decipher: " + file.path + " wrong syntax")
+    return null
+  else
+	password = cryptools.decipher(userPass[1])
+	return password
+end function
+
+printYellow = function(string)
+  print("<color=yellow>" + string + "</color>")
+end function
+
+typeObject = typeof(result)
+if(typeObject != "computer") then exit("Error: expected computer, obtained " + typeObject)
+
+// PASSWD
+printYellow("collecting passwd informations ...")
+computer = get_shell.host_computer
+pathExport = "/home/" + active_user + "/Downloads"
+fileName = "passwd_" + params[0]
+fileExport = computer.File(pathExport + "/" + fileName)
+print("all collected informations will be stored in:\n" + pathExport + "/" + fileName)
+print("")
+
+file = result.File("/etc/passwd")
+listUsers = file.get_content.split("\n")
+for line in listUsers
+  userPass = line.split(":")
+  password = GetPassword(userPass)
+  if not password then 
+    print("Nothing found...")
+  else
+    if not fileExport then
+      computer.touch(pathExport, fileName)
+      content = ""
+    else
+      content = content + "\n" + computer.File(pathExport + "/" + fileName).get_content
+    end if
+    computer.File(pathExport + "/passwd_root_" + params[0]).set_content(content + "\n" + userPass[0] + ":" + password)
+	print("user: " + userPass[0] + "\npassword: " + password)
+  end if
+end for
+
+// BANK
+printYellow("collecting bank informations ...\n")
+folder = result.File("/home")
+if not folder.has_permission("r") then
+  exit("permission denied: " + folder)
+else
+  homeFolders = folder.get_folders
+  output = ""
+  for homeFolder in homeFolders
+    file = result.File("/home/" + homeFolder.name + "/Config/Bank.txt")
+    if file != null then
+      if not file then print("Error: file not found")
+      if not file.has_permission("r") then print("Error: can't read. Permission denied.")
+      if file.is_binary then print("Error: invalid file found.")
+
+      listUsers = file.get_content.split("\n")
+      for line in listUsers
+        userPass = line.split(":")
+	    password = GetPassword(userPass)
+	    if not password then 
+		  print("Nothing found...")
+	    else
+	      fileName = "bank_informations"
+          fileExport = computer.File(pathExport + "/" + fileName)
+
+          if not fileExport then
+            computer.touch(pathExport, fileName)
+            contentBank = ""
+          else
+            contentBank = contentBank + "\n" + computer.File(pathExport + "/" + fileName).get_content
+          end if
+          computer.File(pathExport + "/passwd_root_" + params[0]).set_content(contentBank + "\n" + userPass[0] + ":" + password)
+	
+	      print("user: " + userPass[0] + "\npassword: " + password)
+	    end if
+      end for
+    end if    
+  end for
+end if
+
