@@ -1,4 +1,5 @@
 import_code("/bin/src/function.src")
+clear_screen
 
 //command: nmap
 info("running nmap ...")
@@ -39,6 +40,29 @@ for port in ports
    nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
 end for
 print(format_columns(nmapInfo) + "\n")
+
+//command: scanrouter
+info("running scanrouter ...")
+router = get_router( ipAddress )
+if router == null then error("scanrouter: ip address not found")
+version = router.kernel_version
+if not version then
+	print("Warning: kernel_router.so not found")
+else 
+	print("kernel_router.so : v" + version)
+end if
+
+firewall_rules = router.firewall_rules
+if typeof(firewall_rules) == "string" then error(firewall_rules)
+if firewall_rules.len == 0 then 
+  print("No firewall rules found!\n")
+else
+  scanInfo = "ACTION PORT SOURCE_IP DESTINATION_IP"
+  for rules in firewall_rules
+	scanInfo = scanInfo + "\n" + rules
+  end for
+  print(format_columns(scanInfo) + "\n")
+end if
 
 //command: whois
 info("running whois ...")
