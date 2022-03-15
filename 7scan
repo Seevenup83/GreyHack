@@ -1,12 +1,22 @@
-import_code("/bin/src/function.src")
+printYellow = function(message)
+  print("<color=yellow>" + message + "</color>")
+end function
+
+printRed = function(message)
+  print("<color=red>" + message + "</color>")
+end function
+
+
 clear_screen
+ipAddress = params[0]
+print("checking IP: " + ipAddress)
 
 //command: nmap
-info("running nmap ...")
-if params.len != 1 then error("<b>Usage: 7scan [ip address]</b>")	
-ipAddress = params[0]
-if not is_valid_ip(ipAddress) then error("nmap: invalid ip address")
-if not get_shell.host_computer.is_network_active then error("nmap: No internet access.")
+printYellow("running nmap ...")
+if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")	
+
+if not is_valid_ip(ipAddress) then exit("nmap: invalid ip address")
+if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 
 isLanIp = is_lan_ip( ipAddress )
 if isLanIp then
@@ -15,7 +25,7 @@ else
    router = get_router( ipAddress )
 end if
 
-if router == null then errort("nmap: ip address not found")
+if router == null then exit("nmap: ip address not found")
 ports = null
 
 if not isLanIp then
@@ -24,27 +34,32 @@ else
    ports = router.device_ports(ipAddress)
 end if
 
-if ports == null then error("nmap: ip address not found")
-if typeof(ports) == "string" then error(ports)
-if(ports.len == 0) then error("Scan finished. No open ports.")
+if ports == null then exit("nmap: ip address not found")
+if typeof(ports) == "string" then exit(ports)
+if(ports.len == 0) then exit("Scan finished. No open ports.")
 
-nmapInfo = "PORT STATE SERVICE VERSION LAN"   
+nmapInfo = ""
 for port in ports
-   service_info = router.port_info(port)
-   lan_ips = port.get_lan_ip
-   port_status = "open"
+  service_info = router.port_info(port)
+  lan_ips = port.get_lan_ip
+  port_status = "open"
 
-   if(port.is_closed and not isLanIp) then
-      port_status = "closed"
-   end if
-   nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
+  if(port.is_closed and not isLanIp) then
+     port_status = "closed"
+  end if
+
+  if nmapInfo == "" then
+    nmapInfo = port.port_number + " " + port_status + " " + service_info + " " + lan_ips
+  else
+    nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
+  end if
 end for
-print(format_columns(nmapInfo) + "\n")
+print(format_columns(nmapInfo))
 
 //command: scanrouter
-info("running scanrouter ...")
+printYellow("running scanrouter ...")
 router = get_router( ipAddress )
-if router == null then error("scanrouter: ip address not found")
+if router == null then exit("scanrouter: ip address not found")
 version = router.kernel_version
 if not version then
 	print("Warning: kernel_router.so not found")
@@ -55,15 +70,15 @@ end if
 firewall_rules = router.firewall_rules
 if typeof(firewall_rules) == "string" then error(firewall_rules)
 if firewall_rules.len == 0 then 
-  print("No firewall rules found!\n")
+  print("No firewall rules found!")
 else
   scanInfo = "ACTION PORT SOURCE_IP DESTINATION_IP"
   for rules in firewall_rules
 	scanInfo = scanInfo + "\n" + rules
   end for
-  print(format_columns(scanInfo) + "\n")
+  print(format_columns(scanInfo))
 end if
 
 //command: whois
-info("running whois ...")
+printYellow("running whois ...")
 print(whois(ipAddress))
