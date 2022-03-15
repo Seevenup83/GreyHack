@@ -36,39 +36,44 @@ if(typeObject != "computer") then exit("Error: expected computer, obtained " + t
 // PASSWD
 printYellow("collecting passwd informations ...")
 computer = get_shell.host_computer
-pathExport = "/home/" + active_user + "/Downloads"
-fileName = "passwd_" + params[0]
-fileExport = computer.File(pathExport + "/" + fileName)
-print("all collected informations will be stored in:\n" + pathExport + "/" + fileName)
+exportPath = "/home/" + active_user + "/Downloads"
+exportFile = "passwd_" + params[0]
+exportFilePath = computer.File(exportPath + "/" + exportFile)
+print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
 print("")
 
 file = result.File("/etc/passwd")
 listUsers = file.get_content.split("\n")
+content = null
 for line in listUsers
   userPass = line.split(":")
   password = GetPassword(userPass)
   if not password then 
     print("Nothing found...")
   else
-    if not fileExport then
-      computer.touch(pathExport, fileName)
-      content = ""
+    if not exportFilePath then
+      computer.touch(exportPath, exportFile)
     else
-      content = content + "\n" + computer.File(pathExport + "/" + fileName).get_content
+      content = content + char(10) + computer.File(exportPath + "/" + exportFile).get_content
     end if
-    computer.File(pathExport + "/passwd_root_" + params[0]).set_content(content + "\n" + userPass[0] + ":" + password)
+    computer.File(exportPath + "/" + exportFile).set_content(content + "\n" + userPass[0] + ":" + password)
 	print("user: " + userPass[0] + "\npassword: " + password)
   end if
 end for
 
 // BANK
-printYellow("collecting bank informations ...\n")
+printYellow("collecting bank informations ...")
 folder = result.File("/home")
 if not folder.has_permission("r") then
-  exit("permission denied: " + folder)
+  exit("permission denied: " + folder.name)
 else
   homeFolders = folder.get_folders
-  output = ""
+  exportFile = "bank_informations"
+  exportFilePath = computer.File(exportPath + "/" + exportFile)
+  contentBank = null
+
+  print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
+  print("")
   for homeFolder in homeFolders
     file = result.File("/home/" + homeFolder.name + "/Config/Bank.txt")
     if file != null then
@@ -83,21 +88,15 @@ else
 	    if not password then 
 		  print("Nothing found...")
 	    else
-	      fileName = "bank_informations"
-          fileExport = computer.File(pathExport + "/" + fileName)
-
-          if not fileExport then
-            computer.touch(pathExport, fileName)
-            contentBank = ""
+          if not exportFilePath then
+            computer.touch(exportPath, exportFile)
           else
-            contentBank = contentBank + "\n" + computer.File(pathExport + "/" + fileName).get_content
+            contentBank = contentBank + char(10) + computer.File(exportPath + "/" + exportFile).get_content
           end if
-          computer.File(pathExport + "/passwd_root_" + params[0]).set_content(contentBank + "\n" + userPass[0] + ":" + password)
-	
+          computer.File(exportPath + "/" + exportFile).set_content(contentBank + "\n" + userPass[0] + ":" + password)
 	      print("user: " + userPass[0] + "\npassword: " + password)
 	    end if
       end for
     end if    
   end for
 end if
-
