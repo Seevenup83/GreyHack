@@ -1,5 +1,5 @@
 // NAME: 7wifi (connects automatic to the next WiFi found)
-import_code("/bin/src/function.src")
+import_code("/bin/src/7function.src")
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then error("Missing cryptools: /lib/crypto.so")
 
@@ -38,17 +38,16 @@ for wifiNetwork in wifiNetworks
 end for
 
 // AIRPLAY
-wifiPower = wifiConnection[1].split("%")[0]
 info("aireplay using WiFi: " + essid)
-if wifiPower > 75 then
+if wifiStrong >= 75 then
   maxAcks = 3000
-else if wifiPower > 40 then
+else if wifiStrong >= 50 then
   maxAcks = 4000
 else
   maxAcks = 20000
 end if
 
-info("WiFi connection power is: " + wifiPower + " setting MaxAcks to: " + maxAcks)
+info("WiFi connection power is: " + wifiStrong + " setting MaxAcks to: " + maxAcks)
 
 result = cryptools.aireplay(bssid, essid, maxAcks)
 if typeof(result) == "string" then error(result)
