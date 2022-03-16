@@ -1,5 +1,4 @@
-// TBD: automatic scanlib and try all exploids till one works
-// TBD: cleanup on target host
+// 7ssh: collects all passwd and Bank.txt informations on local computer
 GetPassword = function(userPass)
   if userPass.len != 2 then 
     //print("decipher: " + file.path + " wrong syntax")
@@ -41,6 +40,7 @@ exportFilePath = computer.File(exportPath + "/" + exportFile)
 if not exportFilePath then computer.touch(exportPath, exportFile)
 print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
 
+// PASSWD
 homeComputer = get_shell.host_computer
 file = remoteShell.host_computer.File("/etc/passwd")
 listUsers = file.get_content.split("\n")
@@ -96,7 +96,7 @@ else
 end if
 
 // CLEANUP
-printYellow("claning /var/system.log ...")
+printYellow("cleanup /var/system.log ...")
 fileSyslog = remoteShell.host_computer.File("/var/system.log")
 fileSyslog.set_content("")
 
