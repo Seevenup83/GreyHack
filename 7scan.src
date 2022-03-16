@@ -1,3 +1,8 @@
+cryptools = include_lib("/lib/crypto.so")
+if not cryptools then exit("Error: Missing crypto library")
+
+if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")	
+
 printYellow = function(message)
   print("<color=yellow>" + message + "</color>")
 end function
@@ -6,7 +11,7 @@ printRed = function(message)
   print("<color=red><b>" + message + "</b></color>")
 end function
 
-//command: nmap
+// nmap
 if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")	
 if not is_valid_ip(params[0]) then exit("nmap: invalid ip address")
 if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
@@ -54,7 +59,7 @@ for port in ports
 end for
 if nmapInfo != "" then print(format_columns(nmapInfo))
 
-//command: scanrouter
+// scanrouter
 printYellow("running scanrouter ...")
 router = get_router( ipAddress )
 if router == null then 
@@ -68,7 +73,7 @@ else
   end if
 
   firewall_rules = router.firewall_rules
-  if typeof(firewall_rules) == "string" then error(firewall_rules)
+  if typeof(firewall_rules) == "string" then printRed(firewall_rules)
   if firewall_rules.len == 0 then 
     print("No firewall rules found!")
   else
@@ -80,10 +85,20 @@ else
   end if
 end if
 
-//command: whois
+//whois
 printYellow("running whois ...")
 if whois(ipAddress) == "Error: the IP address must be public" then
   printRed("whois: the IP address must be public")
 else
   print(whois(ipAddress))
 end if
+
+// smtp_user_list
+printYellow("running smtp_user_list ...")
+users = cryptools.smtp_user_list(ipAddress, 25)
+if(typeof(users) == "string") then printRed(users)
+
+for user in users
+  userPass = user.split(" ")
+   print(userPass[0])
+end for
