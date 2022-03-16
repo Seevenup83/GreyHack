@@ -1,9 +1,10 @@
+// TBD: automatic scanlib and try all exploids till one works
+// TBD: cleanup on target host
 GetPassword = function(userPass)
   if userPass.len != 2 then 
-    print("decipher: " + file.path + " wrong syntax")
+    //print("decipher: " + file.path + " wrong syntax")
     return null
   else
-    print(char(10))
 	password = cryptools.decipher(userPass[1])
 	return password
 end function
@@ -15,7 +16,7 @@ end function
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
 
-//Command: ssh
+// SSH
 if params.len < 2 or params.len > 3 then exit("<b>Usage: 7ssh [user@password] [ip address] [(opt) port]</b>")
 credentials = params[0].split("@")
 remoteHost = params[1]
@@ -47,16 +48,14 @@ content = ""
 for line in listUsers
   userPass = line.split(":")
   password = GetPassword(userPass)
-  if not password then 
-    print("Nothing found ...")
-  else
+  if password then
     content = homeComputer.File(exportPath + "/" + exportFile).get_content
     homeComputer.File(exportPath + "/" + exportFile).set_content(content + char(10) + userPass[0] + ":" + password)
     print("user: " + userPass[0] + "\npassword: " + password)
   end if
 end for
 
-// BANK crack and store information in single file
+// BANK: crack and store information in single file
 printYellow("collecting bank informations ...")
 folder = remoteShell.host_computer.File("/home")
 if not folder.has_permission("r") then
@@ -95,3 +94,11 @@ else
     end if    
   end for
 end if
+
+// CLEANUP
+printYellow("claning /var/system.log ...")
+fileSyslog = remoteShell.host_computer.File("/var/system.log")
+fileSyslog.set_content("")
+
+// EXIT
+exit("... connection to " + remoteHost + " closed")
