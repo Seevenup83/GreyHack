@@ -1,6 +1,5 @@
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
-
 if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")	
 
 printYellow = function(message)
@@ -96,9 +95,11 @@ end if
 // smtp_user_list
 printYellow("running smtp_user_list ...")
 users = cryptools.smtp_user_list(ipAddress, 25)
-if(typeof(users) == "string") then printRed(users)
-
-for user in users
-  userPass = user.split(" ")
-   print(userPass[0])
-end for
+if(typeof(users) == "string") then 
+  printRed(users)
+else
+  for user in users
+    userPass = user.split(" ")
+    print(userPass[0])
+  end for
+end if
