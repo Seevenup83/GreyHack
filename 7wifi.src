@@ -2,6 +2,10 @@
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Missing cryptools: /lib/crypto.so")
 
+printYellow = function(message)
+  print("<color=yellow>" + message + "</color>")
+end function
+
 // AIRMON
 computer = get_shell.host_computer
 networkDevices = computer.network_devices
@@ -16,14 +20,14 @@ end while
 output = cryptools.airmon("start", interfaceName)
 if not output then exit("airmon: " + interfaceName + " not found")
 if typeof(output) == "string" then error(output)
-print("airmon started on: " + interfaceName)
+printYellow("airmon started on: " + interfaceName)
 
 // WIFI NETWORKS
 wifiNetworks = computer.wifi_networks(interfaceName)
 
 counter = 0
 wifiStrong = 0
-print("searching for strongest WiFi-Network ...")
+printYellow("searching for strongest WiFi-Network ...")
 for wifiNetwork in wifiNetworks
 	wifiConnection = wifiNetworks[counter].split(" ") //TBD: check if last is always the strongest
 	wifiPower = wifiConnection[1].split("%")[0]
@@ -39,14 +43,14 @@ end for
 // AIRPLAY
 print("aireplay using WiFi: " + essid)
 if wifiStrong >= 75 then
-  maxAcks = 3000
-else if wifiStrong >= 50 then
   maxAcks = 4000
+else if wifiStrong >= 50 then
+  maxAcks = 5000
 else
   maxAcks = 20000
 end if
 
-print("WiFi connection power is: " + wifiStrong + " setting MaxAcks to: " + maxAcks)
+printYellow("WiFi connection power is: " + wifiStrong + " setting MaxAcks to: " + maxAcks)
 
 result = cryptools.aireplay(bssid, essid, maxAcks)
 if typeof(result) == "string" then exit(result)
@@ -63,7 +67,7 @@ file.delete // Cleanup: remove file.cap
 if not password then exit("aircrack: Unable to get the key")
 
 if computer.connect_wifi(interfaceName, bssid, essid, password) then
-  print("successfully connected to WiFi: " + essid + " with password: " + password)
+  printYellow("successfully connected to WiFi: " + essid + " with password: " + password)
 else
   exit("could not connect to WiFi: " + essid)
 end if
