@@ -1,0 +1,15 @@
+// 7fastdecipher
+cryptools = include_lib("/lib/crypto.so")
+if not cryptools then exit("Error: Missing crypto library")
+if params.len != 1 then exit("decipher_usage")
+
+GetPassword = function(userPass)
+	if userPass.len != 2 then exit("decipher: " + file.path + " wrong syntax")
+	password = cryptools.decipher(userPass[1])
+	return password
+end function
+
+userPass = params[0].split(":")
+password = GetPassword(userPass)
+if not password then exit("Can't find password")
+print("user: " + userPass[0] + " password: " + password)
