@@ -1,7 +1,9 @@
 // 7ssh: collects all passwd and Bank.txt informations on local computer
+pathDownload = "/data/libs"
+pathTemp = "/data"
+// FUNCTIONS
 GetPassword = function(userPass)
   if userPass.len != 2 then 
-    //print("decipher: " + file.path + " wrong syntax")
     return null
   else
 	password = cryptools.decipher(userPass[1])
@@ -12,6 +14,7 @@ printYellow = function(string)
   print("<color=yellow>" + string + "</color>")
 end function
 
+// LOAD LIBS
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
 
@@ -27,21 +30,22 @@ if params.len == 3 then port = params[2].to_int
 if typeof(port) != "number" then exit("Invalid port: " + port)
 print("Connecting to: " + remoteHost + " ...")
 
-remoteShell = get_shell.connect_service(params[1], port, remoteUsr, remotePas, "ssh")
+localShell = get_shell
+localComputer = localShell.host_computer
+
+remoteShell = get_shell.connect_service(remoteHost, port, remoteUsr, remotePas)
+remoteComputer = remoteShell.host_computer
 if typeof(remoteShell) == "string" then exit(remoteShell)
 if not remoteShell then exit("connection failed")
-//remoteShell.start_terminal
-
-printYellow("collecting passwd informations ...")
-computer = get_shell.host_computer
-exportPath = "/home/" + active_user + "/Downloads"
-exportFile = "passwd_" + remoteHost
-exportFilePath = computer.File(exportPath + "/" + exportFile)
-if not exportFilePath then computer.touch(exportPath, exportFile)
-print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
 
 // PASSWD
-homeComputer = get_shell.host_computer
+printYellow("collecting passwd informations ...")
+exportPath = "/home/" + active_user + "/Downloads"
+exportFile = "passwd_" + remoteHost
+exportFilePath = localComputer.File(exportPath + "/" + exportFile)
+if not exportFilePath then localComputer.touch(exportPath, exportFile)
+print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
+
 file = remoteShell.host_computer.File("/etc/passwd")
 listUsers = file.get_content.split("\n")
 content = ""
@@ -49,24 +53,27 @@ for line in listUsers
   userPass = line.split(":")
   password = GetPassword(userPass)
   if password then
-    content = homeComputer.File(exportPath + "/" + exportFile).get_content
-    homeComputer.File(exportPath + "/" + exportFile).set_content(content + char(10) + userPass[0] + ":" + password)
+    content = localComputer.File(exportPath + "/" + exportFile).get_content
+    localComputer.File(exportPath + "/" + exportFile).set_content(content + char(10) + userPass[0] + ":" + password)
     print("user: " + userPass[0] + "\npassword: " + password)
   end if
 end for
+
+
+
 
 // BANK: crack and store information in single file
 printYellow("collecting bank informations ...")
 folder = remoteShell.host_computer.File("/home")
 if not folder.has_permission("r") then
-  exit("permission denied: " + folder.name)
+  print("permission denied: " + folder.name)
 else
   homeFolders = folder.get_folders
   exportFile = "bank_informations"
-  exportFilePath = homeComputer.File(exportPath + "/" + exportFile)
+  exportFilePath = localComputer.File(exportPath + "/" + exportFile)
   contentBank = ""
 
-  print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
+  print("all collected informations will be stored in: " + exportPath + "/" + exportFile)
   print("")
   for homeFolder in homeFolders
     file = remoteShell.host_computer.File("/home/" + homeFolder.name + "/Config/Bank.txt")
@@ -79,15 +86,13 @@ else
       for line in listUsers
         userPass = line.split(":")
 	    password = GetPassword(userPass)
-	    if not password then 
-		  print("Nothing found...")
-	    else
+	    if password then 
           if not exportFilePath then
-            homeComputer.touch(exportPath, exportFile)
+            localComputer.touch(exportPath, exportFile)
           else
-            contentBank = homeComputer.File(exportPath + "/" + exportFile).get_content
+            contentBank = localComputer.File(exportPath + "/" + exportFile).get_content
           end if
-          homeComputer.File(exportPath + "/" + exportFile).set_content(contentBank + char(10) + userPass[0] + ":" + password)
+          localComputer.File(exportPath + "/" + exportFile).set_content(contentBank + char(10) + userPass[0] + ":" + password)
 	      print("user: " + userPass[0] + "\npassword: " + password)
 	    end if
       end for
@@ -95,10 +100,32 @@ else
   end for
 end if
 
-// CLEANUP
+
+// SCAN LIBs
+printYellow("collecting /lib informations ...")
+
+folderLib = remoteComputer.File("/lib")
+if not folderLib.has_permission("r") then
+  print("permission denied: " + folderLib.name)
+else
+  libFiles = folderLib.get_files
+  metaxploit = include_lib("/lib/metaxploit.so")
+  for libFile in libFiles
+    
+    libRemote = remoteComputer.File("/lib/" + libFile.name)
+    remoteShell.scp(libRemote.path, pathTemp, localShell) // DOWNLOAD
+
+    metaLib = metaxploit.load(pathTemp + "/" + libFile.name)
+    libLocal = localComputer.File(pathTemp + "/" + libFile.name)
+    localComputer.create_folder(pathDownload, metaLib.version)
+    print("file saved: " + pathDownload + "/" + metaLib.version + "/" + libFile.name + "\n")
+    libLocal.move(pathDownload + "/" + metaLib.version, libFile.name)
+  end for
+end if
+
+// TBD: CLEANUP
 printYellow("cleanup /var/system.log ...")
-fileSyslog = remoteShell.host_computer.File("/var/system.log")
-fileSyslog.set_content("")
+localShell.scp(pathTemp + "/system.log", "/var/", remoteShell) // DOWNLOAD
 
 // EXIT
 exit("... connection to " + remoteHost + " closed")
