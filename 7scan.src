@@ -3,20 +3,18 @@ printYellow = function(message)
 end function
 
 printRed = function(message)
-  print("<color=red>" + message + "</color>")
+  print("<color=red><b>" + message + "</b></color>")
 end function
 
-
-clear_screen
+//command: nmap
+if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")	
+if not is_valid_ip(params[0]) then exit("nmap: invalid ip address")
+if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 ipAddress = params[0]
+clear_screen
 print("checking IP: " + ipAddress)
 
-//command: nmap
 printYellow("running nmap ...")
-if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")	
-
-if not is_valid_ip(ipAddress) then exit("nmap: invalid ip address")
-if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 
 isLanIp = is_lan_ip( ipAddress )
 if isLanIp then
@@ -25,7 +23,7 @@ else
    router = get_router( ipAddress )
 end if
 
-if router == null then exit("nmap: ip address not found")
+if router == null then printRed("nmap: ip address not found")
 ports = null
 
 if not isLanIp then
@@ -34,9 +32,9 @@ else
    ports = router.device_ports(ipAddress)
 end if
 
-if ports == null then exit("nmap: ip address not found")
+if ports == null then printRed("nmap: ip address not found")
 if typeof(ports) == "string" then exit(ports)
-if(ports.len == 0) then exit("Scan finished. No open ports.")
+if(ports.len == 0) then printRed("nmap: No open ports found")
 
 nmapInfo = ""
 for port in ports
@@ -54,31 +52,38 @@ for port in ports
     nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
   end if
 end for
-print(format_columns(nmapInfo))
+if nmapInfo != "" then print(format_columns(nmapInfo))
 
 //command: scanrouter
 printYellow("running scanrouter ...")
 router = get_router( ipAddress )
-if router == null then exit("scanrouter: ip address not found")
-version = router.kernel_version
-if not version then
-	print("Warning: kernel_router.so not found")
-else 
-	print("kernel_router.so : v" + version)
-end if
-
-firewall_rules = router.firewall_rules
-if typeof(firewall_rules) == "string" then error(firewall_rules)
-if firewall_rules.len == 0 then 
-  print("No firewall rules found!")
+if router == null then 
+  printRed("scanrouter: ip address not found")
 else
-  scanInfo = "ACTION PORT SOURCE_IP DESTINATION_IP"
-  for rules in firewall_rules
-	scanInfo = scanInfo + "\n" + rules
-  end for
-  print(format_columns(scanInfo))
+  version = router.kernel_version
+  if not version then
+	print("Warning: kernel_router.so not found")
+  else 
+	print("kernel_router.so : v" + version)
+  end if
+
+  firewall_rules = router.firewall_rules
+  if typeof(firewall_rules) == "string" then error(firewall_rules)
+  if firewall_rules.len == 0 then 
+    print("No firewall rules found!")
+  else
+    scanInfo = "ACTION PORT SOURCE_IP DESTINATION_IP"
+    for rules in firewall_rules
+      scanInfo = scanInfo + "\n" + rules
+    end for
+    print(format_columns(scanInfo))
+  end if
 end if
 
 //command: whois
 printYellow("running whois ...")
-print(whois(ipAddress))
+if whois(ipAddress) == "Error: the IP address must be public" then
+  printRed("whois: the IP address must be public")
+else
+  print(whois(ipAddress))
+end if
