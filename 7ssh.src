@@ -1,4 +1,6 @@
 // 7ssh: collects all passwd and Bank.txt and libs
+//BUG: TBD -> create folder if not exist (only if new installed (folder missing))
+
 if params.len < 2 or params.len > 3 then exit("<b>Usage: 7ssh [user@password] [ip address] [(opt) port]</b>")
 credentials = params[0].split("@")
 remoteHost = params[1]
@@ -9,10 +11,9 @@ if params.len == 3 then port = params[2].to_int
 if typeof(port) != "number" then exit("Invalid port: " + port)
 
 // Change here values if wanted
-pathDownload = "/data/libs" // place where all the libs will be stored
-pathTemp = "/data" // temporary place till moved to final desination
-exportPath = "/home/" + active_user + "/Downloads" // bank and passwd save place
-exportFile = "passwd_" + remoteHost // exp: passwd_12.2.3.1
+pathTemp = "/home/" + active_user + "/Downloads" // temporary place till moved to final desination
+pathLib = pathTemp + "/libs" // place where all the libs will be stored
+pathCracked = pathTemp + "/cracked" // bank and passwd save place
 
 // FUNCTIONS
 GetPassword = function(userPass)
@@ -41,12 +42,13 @@ if typeof(remoteShell) == "string" then exit(remoteShell)
 if not remoteShell then exit("connection failed")
 
 // PASSWD
-exportFilePath = localComputer.File(exportPath + "/" + exportFile)
+exportFile = "passwd_" + remoteHost // exp: passwd_12.2.3.1
+exportFilePath = localComputer.File(pathCracked + "/" + exportFile)
 if exportFilePath then exportFilePath.delete // remove in case multiple time run
-localComputer.touch(exportPath, exportFile)
+localComputer.touch(pathCracked, exportFile)
 
 printYellow("collecting passwd informations ...")
-print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
+print("all collected informations will be stored in:\n" + pathCracked + "/" + exportFile)
 print("")
 file = remoteShell.host_computer.File("/etc/passwd")
 listUsers = file.get_content.split("\n")
@@ -55,8 +57,8 @@ for line in listUsers
   userPass = line.split(":")
   password = GetPassword(userPass)
   if password then
-    content = localComputer.File(exportPath + "/" + exportFile).get_content
-    localComputer.File(exportPath + "/" + exportFile).set_content(content + char(10) + userPass[0] + ":" + password)
+    content = localComputer.File(pathCracked + "/" + exportFile).get_content
+    localComputer.File(pathCracked + "/" + exportFile).set_content(content + char(10) + userPass[0] + ":" + password)
     print("user: " + userPass[0] + "\npassword: " + password)
   end if
 end for
@@ -69,10 +71,10 @@ if not folder.has_permission("r") then
 else
   homeFolders = folder.get_folders
   exportFile = "bank_informations"
-  exportFilePath = localComputer.File(exportPath + "/" + exportFile)
+  exportFilePath = localComputer.File(pathCracked + "/" + exportFile)
   contentBank = ""
 
-  print("all collected informations will be stored in:\n" + exportPath + "/" + exportFile)
+  print("all collected informations will be stored in:\n" + pathCracked + "/" + exportFile)
   print("")
   for homeFolder in homeFolders
     file = remoteShell.host_computer.File("/home/" + homeFolder.name + "/Config/Bank.txt")
@@ -86,12 +88,9 @@ else
         userPass = line.split(":")
 	    password = GetPassword(userPass)
 	    if password then 
-          if not exportFilePath then
-            localComputer.touch(exportPath, exportFile)
-          else
-            contentBank = localComputer.File(exportPath + "/" + exportFile).get_content
-          end if
-          localComputer.File(exportPath + "/" + exportFile).set_content(contentBank + char(10) + userPass[0] + ":" + password)
+          if not exportFilePath then localComputer.touch(pathCracked, exportFile)
+          contentBank = localComputer.File(pathCracked + "/" + exportFile).get_content
+          localComputer.File(pathCracked + "/" + exportFile).set_content(contentBank + char(10) + userPass[0] + ":" + password)
 	      print("user: " + userPass[0] + "\npassword: " + password + "\n")
 	    end if
       end for
@@ -114,14 +113,15 @@ else
 
     metaLib = metaxploit.load(pathTemp + "/" + libFile.name)
     libLocal = localComputer.File(pathTemp + "/" + libFile.name)
-    localComputer.create_folder(pathDownload, metaLib.version)
-    print("file saved: " + pathDownload + "/" + metaLib.version + "/" + libFile.name + "\n")
-    libLocal.move(pathDownload + "/" + metaLib.version, libFile.name)
+    localComputer.create_folder(pathLib, metaLib.version)
+    print("file saved: " + pathLib + "/" + metaLib.version + "/" + libFile.name + "\n")
+    libLocal.move(pathLib + "/" + metaLib.version, libFile.name)
   end for
 end if
 
 // CLEANUP
 printYellow("cleanup /var/system.log ...\n")
+//TBD: check if system.log is there, if not inform user to create an empty system.log
 localShell.scp(pathTemp + "/system.log", "/var/", remoteShell) // DOWNLOAD
 
 exit("... connection to " + remoteHost + " closed")
