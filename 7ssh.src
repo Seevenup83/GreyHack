@@ -121,11 +121,12 @@ else
 end if
 
 // install and connect rshell on remote
-printYellow("installing rshellbackdoor ...\n")
+printYellow("installing rshellbackdoor ...")
 localShell.scp("/lib/metaxploit.so", "/lib", remoteShell) // UPLOAD
 localShell.scp("/data/rshellbackdoor", "/root", remoteShell) // UPLOAD
 remoteShell.launch("/root/rshellbackdoor", rshellServer)
-remoteComputer.File("root/rshellbackdoor").delete
+fileRemove = remoteComputer.File("/root/rshellbackdoor")
+fileRemove.delete
 
 // CLEANUP
 printYellow("cleanup /var/system.log ...\n")
