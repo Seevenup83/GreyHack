@@ -1,0 +1,16 @@
+// 7attack
+ip=function()
+    n=function();return floor((rnd*255) + 0);end function
+    address=[n,n,n,n].join(".")
+    if is_valid_ip(address) then return address //else ip()
+end function
+
+nr = 0
+crateIp = 100
+
+while nr <= crateIp
+//  print(ip)
+  get_shell.launch("/bin/sshpasswd", ip)
+  nr = nr + 1
+wait(1)
+end while
