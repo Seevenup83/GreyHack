@@ -1,0 +1,4 @@
+rshellServer = params[0]
+metaxploit = include_lib("/lib/metaxploit.so")
+metaxploit.rshell_client(rshellServer,1222,"Umming")
+print("backdoor successful installed")
