@@ -1,6 +1,6 @@
-// 7ssh: collects all passwd and Bank.txt and libs
-//BUG: TBD -> create folder if not exist (only if new installed (folder missing))
-
+// NAME: 7ssh (collects all passwd and Bank.txt and libs)
+// BUG -> create folder if not exist (only if new installed (folder missing))
+// BUG: check if rshell script is there
 if params.len < 2 or params.len > 3 then exit("<b>Usage: 7ssh [user@password] [ip address] [(opt) port]</b>")
 credentials = params[0].split("@")
 remoteHost = params[1]
@@ -18,7 +18,7 @@ rshellServer = "29.88.203.47"
 
 // FUNCTIONS
 GetPassword = function(userPass)
-  if userPass.len != 2 then 
+  if userPass.len != 2 then
     return null
   else
 	password = cryptools.decipher(userPass[1])
@@ -88,14 +88,14 @@ else
       for line in listUsers
         userPass = line.split(":")
 	    password = GetPassword(userPass)
-	    if password then 
+	    if password then
           if not exportFilePath then localComputer.touch(pathCracked, exportFile)
           contentBank = localComputer.File(pathCracked + "/" + exportFile).get_content
           localComputer.File(pathCracked + "/" + exportFile).set_content(contentBank + char(10) + userPass[0] + ":" + password)
 	      print("user: " + userPass[0] + "\npassword: " + password + "\n")
 	    end if
       end for
-    end if    
+    end if
   end for
 end if
 
@@ -108,7 +108,7 @@ else
   libFiles = folderLib.get_files
   metaxploit = include_lib("/lib/metaxploit.so")
   for libFile in libFiles
-    
+
     libRemote = remoteComputer.File("/lib/" + libFile.name)
     remoteShell.scp(libRemote.path, pathTemp, localShell) // DOWNLOAD
 

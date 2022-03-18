@@ -1,5 +1,4 @@
-// NAME: 7fastdecipher
-// DESC: decipher an input-sring
+// NAME: 7fastdecipher (decipher an input-sring)
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
 if params.len != 1 then exit("<b>Usage: 7fastdecipher [user:password]</b>")

@@ -1,4 +1,4 @@
-// NAME: 7wifi (connects automatic to the strongest WiFi found)
+// DESC: 7wifi (connects automatic to the strongest WiFi found)
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Missing cryptools: /lib/crypto.so")
 
@@ -31,7 +31,7 @@ printYellow("searching for strongest WiFi-Network ...")
 for wifiNetwork in wifiNetworks
 	wifiConnection = wifiNetworks[counter].split(" ") //TBD: check if last is always the strongest
 	wifiPower = wifiConnection[1].split("%")[0]
-	
+
 	if wifiPower > wifiStrong then
 	  wifiStrong = wifiPower
 	  bssid = wifiConnection[0]
@@ -59,7 +59,7 @@ if typeof(result) == "string" then exit(result)
 pathFile = "file.cap"
 file = computer.File(pathFile)
 if file == null then exit("aircrack: file not found: " + pathFile)
-if not file.is_binary then exit("aircrack: not valid filecap.")		
+if not file.is_binary then exit("aircrack: not valid filecap.")
 if not file.has_permission("r") then exit("aircrack: permission denied")
 
 password = cryptools.aircrack(file.path)

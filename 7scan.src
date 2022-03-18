@@ -1,6 +1,7 @@
+// NAME: 7scan (gives all kind of information to given ip-addr)
 cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
-if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")	
+if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")
 
 printYellow = function(message)
   print("<color=yellow>" + message + "</color>")
@@ -11,7 +12,7 @@ printRed = function(message)
 end function
 
 // nmap
-if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")	
+if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")
 if not is_valid_ip(params[0]) then exit("nmap: invalid ip address")
 if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 ipAddress = params[0]
@@ -19,11 +20,10 @@ clear_screen
 print("checking IP: " + ipAddress)
 
 printYellow("running nmap ...")
-
 isLanIp = is_lan_ip( ipAddress )
 if isLanIp then
    router = get_router;
-else 
+else
    router = get_router( ipAddress )
 end if
 
@@ -61,19 +61,19 @@ if nmapInfo != "" then print(format_columns(nmapInfo))
 // scanrouter
 printYellow("running scanrouter ...")
 router = get_router( ipAddress )
-if router == null then 
+if router == null then
   printRed("scanrouter: ip address not found")
 else
   version = router.kernel_version
   if not version then
 	print("Warning: kernel_router.so not found")
-  else 
+  else
 	print("kernel_router.so : v" + version)
   end if
 
   firewall_rules = router.firewall_rules
   if typeof(firewall_rules) == "string" then printRed(firewall_rules)
-  if firewall_rules.len == 0 then 
+  if firewall_rules.len == 0 then
     print("No firewall rules found!")
   else
     scanInfo = "ACTION PORT SOURCE_IP DESTINATION_IP"
@@ -95,7 +95,7 @@ end if
 // smtp_user_list
 printYellow("running smtp_user_list ...")
 users = cryptools.smtp_user_list(ipAddress, 25)
-if(typeof(users) == "string") then 
+if(typeof(users) == "string") then
   printRed(users)
 else
   for user in users
