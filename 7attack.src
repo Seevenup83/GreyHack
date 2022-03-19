@@ -61,11 +61,10 @@ net_session = metaxploit.net_use(ipAddress, port)
 metaLib = net_session.dump_lib
 memoryZones = metaxploit.scan(metaLib)
 for memoryZone in memoryZones
-  PrintWhite("memoryZone: " + memoryZone)
   unsafeChecks = metaxploit.scan_address(metaLib, memoryZone)
   for unsafeCheck in unsafeChecks.split("<b>")[1:unsafeChecks.len]
 	bufferString = unsafeCheck.split("</b>")[0]
-    PrintWhite("bufferOverflow: " + bufferString)
+    PrintWhite("trying: memoryZone: " + memoryZone + " bufferString: " + bufferString + " ...")
 	result = metaLib.overflow(memoryZone, bufferString)
 	if result and result != null then
       if typeof(result) == "shell" then CheckPasswd(result.host_computer.File("/etc/passwd"))
