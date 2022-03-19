@@ -1,5 +1,5 @@
 rshellServer = params[0]
 rshellServerPassword = "xxxx"
 metaxploit = include_lib("/lib/metaxploit.so")
-metaxploit.rshell_client(rshellServer,1222,rshellServerPassword)
-print("backdoor successful installed")
+returnCode = metaxploit.rshell_client(rshellServer,1222,rshellServerPassword)
+if returnCode == 1 then print("backdoor successful installed")
