@@ -21,7 +21,7 @@ if params.len == 3 then port = params[2].to_int
 if typeof(port) != "number" then exit("Invalid port: " + port)
 
 // FUNCTIONS
-GetPassword = function(userPass)
+GetPassword=function(userPass)
   if userPass.len != 2 then
     return null
   else
@@ -29,21 +29,21 @@ GetPassword = function(userPass)
 	return password
 end function
 
-printYellow = function(string)
+PrintYellowP=function(string)
   print("<color=yellow>" + string + "</color>")
 end function
 
-printWhite = function(string)
+PrintWhite=function(string)
   print("<color=white>" + string + "</color>")
 end function
 
-getPasswd=function() // crack and store information in a new file
+GetPasswd=function() // crack and store information in a new file
   exportFile = "passwd_" + remoteHost // exp: passwd_12.2.3.1
   exportFilePath = localComputer.File(pathCracked + "/" + exportFile)
   if exportFilePath then exportFilePath.delete // remove in case multiple time run
   localComputer.touch(pathCracked, exportFile)
 
-  printWhite("collecting passwd informations ...")
+  PrintWhite("collecting passwd informations ...")
   print("all collected informations will be stored in:\n" + pathCracked + "/" + exportFile)
   print("")
   file = remoteShell.host_computer.File("/etc/passwd")
@@ -60,9 +60,9 @@ getPasswd=function() // crack and store information in a new file
   end for
 end function
 
-getBank=function() // crack and store information in single file
+GetBank=function() // crack and store information in single file
   folder = remoteShell.host_computer.File("/home")
-  printWhite("collecting bank informations ...")
+  PrintWhite("collecting bank informations ...")
   if not folder.has_permission("r") then
     print("permission denied: " + folder.name)
   else
@@ -96,8 +96,8 @@ getBank=function() // crack and store information in single file
   end if
 end function
 
-getLibs=function() // download all libs
-  printWhite("collecting /lib informations ...")
+GetLibs=function() // download all libs
+  PrintWhite("collecting /lib informations ...")
   folderLib = remoteComputer.File("/lib")
   if not folderLib.has_permission("r") then
     print("permission denied: " + folderLib.name)
@@ -118,8 +118,8 @@ getLibs=function() // download all libs
   end if
 end function
 
-installRshell=function() // install and connect rshell on remote
-  printWhite("connecting to rshellserver: " + rshellServer + " ...\n")
+InstallRshell=function() // install and connect rshell on remote
+  PrintWhite("connecting to rshellserver: " + rshellServer + " ...\n")
   localShell.scp("/lib/metaxploit.so", "/lib", remoteShell) // UPLOAD
   localShell.scp(pathTemp + "/rshellbackdoor", "/root", remoteShell) // UPLOAD
   remoteShell.launch("/root/rshellbackdoor", rshellServer)
@@ -127,7 +127,7 @@ installRshell=function() // install and connect rshell on remote
   fileRemove.delete
 end function
 
-printYellow("running: /bin/7ssh " + remoteUsr + "@" + remotePas + " " + remoteHost + " " + port)
+PrintYellowP("running: /bin/7ssh " + remoteUsr + "@" + remotePas + " " + remoteHost + " " + port)
 
 // SSH
 print("Connecting to: " + remoteHost + " ...")
@@ -138,15 +138,14 @@ remoteComputer = remoteShell.host_computer
 if typeof(remoteShell) == "string" then exit(remoteShell)
 if not remoteShell then exit("connection failed")
 
-// START function you want to use
-//getPasswd()
-getBank()
-//getLibs()
-installRshell()
+// START function(s) you want to use
+//GetPasswd() // only for missions needed
+GetBank() // get all bank passwords
+//GetLibs() // for lib colleation (needs a lot of diskspace)
+InstallRshell() // install rshell-backbone
 
-// CLEANUP
-printWhite("cleanup /var/system.log ...\n")
-//TBD: check if system.log is there, if not inform user to create an empty system.log
+// CLEANUP: TBD -> check if system.log is there, if not inform user to create an empty system.log
+PrintWhite("cleanup /var/system.log ...\n")
 localShell.scp(pathTemp + "/system.log", "/var/", remoteShell) // DOWNLOAD
 
 exit("... connection to " + remoteHost + " closed")
