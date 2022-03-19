@@ -3,6 +3,19 @@ cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
 if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")
 
+getSMT=function(ip, port)
+  printYellow("running smtp_user_list ...")
+  users = cryptools.smtp_user_list(ipAddress, 25)
+  if(typeof(users) == "string") then
+    printRed(users)
+  else
+    for user in users
+      userPass = user.split(" ")
+      print(userPass[0])
+    end for
+  end if
+end function
+
 printYellow = function(message)
   print("<color=yellow>" + message + "</color>")
 end function
@@ -54,6 +67,7 @@ for port in ports
     nmapInfo = port.port_number + " " + port_status + " " + service_info + " " + lan_ips
   else
     nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
+    if service_info == "" then getSMT(ipAddress, port.port_number)
   end if
 end for
 if nmapInfo != "" then print(format_columns(nmapInfo))
@@ -90,16 +104,4 @@ if whois(ipAddress) == "Error: the IP address must be public" then
   printRed("whois: the IP address must be public")
 else
   print(whois(ipAddress))
-end if
-
-// smtp_user_list
-printYellow("running smtp_user_list ...")
-users = cryptools.smtp_user_list(ipAddress, 25)
-if(typeof(users) == "string") then
-  printRed(users)
-else
-  for user in users
-    userPass = user.split(" ")
-    print(userPass[0])
-  end for
 end if
