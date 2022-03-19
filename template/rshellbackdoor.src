@@ -1,4 +1,5 @@
 rshellServer = params[0]
+rshellServerPassword = "xxxx"
 metaxploit = include_lib("/lib/metaxploit.so")
-metaxploit.rshell_client(rshellServer,1222,"techno")
+metaxploit.rshell_client(rshellServer,1222,rshellServerPassword)
 print("backdoor successful installed")
