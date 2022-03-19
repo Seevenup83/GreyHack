@@ -4,7 +4,7 @@ if not cryptools then exit("Error: Missing crypto library")
 if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")
 
 getSMT=function(ip, port)
-  printYellow("running smtp_user_list ...")
+  printWhite("running smtp_user_list ...")
   users = cryptools.smtp_user_list(ipAddress, 25)
   if(typeof(users) == "string") then
     printRed(users)
@@ -16,8 +16,12 @@ getSMT=function(ip, port)
   end if
 end function
 
-printYellow = function(message)
-  print("<color=yellow>" + message + "</color>")
+printYellow = function(string)
+  print("<color=yellow>" + string + "</color>")
+end function
+
+printWhite = function(string)
+  print("<color=white>" + string + "</color>")
 end function
 
 printRed = function(message)
@@ -30,9 +34,10 @@ if not is_valid_ip(params[0]) then exit("nmap: invalid ip address")
 if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 ipAddress = params[0]
 clear_screen
+printYellow("running /bin/7scan")
 print("checking IP: " + ipAddress)
 
-printYellow("running nmap ...")
+printWhite("running nmap ...")
 isLanIp = is_lan_ip( ipAddress )
 if isLanIp then
    router = get_router;
@@ -73,7 +78,7 @@ end for
 if nmapInfo != "" then print(format_columns(nmapInfo))
 
 // scanrouter
-printYellow("running scanrouter ...")
+printWhite("running scanrouter ...")
 router = get_router( ipAddress )
 if router == null then
   printRed("scanrouter: ip address not found")
@@ -99,7 +104,7 @@ else
 end if
 
 //whois
-printYellow("running whois ...")
+printWhite("running whois ...")
 if whois(ipAddress) == "Error: the IP address must be public" then
   printRed("whois: the IP address must be public")
 else

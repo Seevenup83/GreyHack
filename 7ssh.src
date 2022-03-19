@@ -33,13 +33,17 @@ printYellow = function(string)
   print("<color=yellow>" + string + "</color>")
 end function
 
+printWhite = function(string)
+  print("<color=white>" + string + "</color>")
+end function
+
 getPasswd=function() // crack and store information in a new file
   exportFile = "passwd_" + remoteHost // exp: passwd_12.2.3.1
   exportFilePath = localComputer.File(pathCracked + "/" + exportFile)
   if exportFilePath then exportFilePath.delete // remove in case multiple time run
   localComputer.touch(pathCracked, exportFile)
 
-  printYellow("collecting passwd informations ...")
+  printWhite("collecting passwd informations ...")
   print("all collected informations will be stored in:\n" + pathCracked + "/" + exportFile)
   print("")
   file = remoteShell.host_computer.File("/etc/passwd")
@@ -58,7 +62,7 @@ end function
 
 getBank=function() // crack and store information in single file
   folder = remoteShell.host_computer.File("/home")
-  printYellow("collecting bank informations ...")
+  printWhite("collecting bank informations ...")
   if not folder.has_permission("r") then
     print("permission denied: " + folder.name)
   else
@@ -93,7 +97,7 @@ getBank=function() // crack and store information in single file
 end function
 
 getLibs=function() // download all libs
-  printYellow("collecting /lib informations ...")
+  printWhite("collecting /lib informations ...")
   folderLib = remoteComputer.File("/lib")
   if not folderLib.has_permission("r") then
     print("permission denied: " + folderLib.name)
@@ -115,13 +119,15 @@ getLibs=function() // download all libs
 end function
 
 installRshell=function() // install and connect rshell on remote
-  printYellow("installing rshellbackdoor ...")
+  printWhite("installing rshellbackdoor ...\n")
   localShell.scp("/lib/metaxploit.so", "/lib", remoteShell) // UPLOAD
   localShell.scp(pathTemp + "/rshellbackdoor", "/root", remoteShell) // UPLOAD
   remoteShell.launch("/root/rshellbackdoor", rshellServer)
   fileRemove = remoteComputer.File("/root/rshellbackdoor")
   fileRemove.delete
 end function
+
+printYellow("running /bin/7ssh " + remoteUsr + "@" + remotePas + " " + remoteHost + " " + port)
 
 // SSH
 print("Connecting to: " + remoteHost + " ...")
@@ -138,7 +144,7 @@ getBank()
 installRshell()
 
 // CLEANUP
-printYellow("cleanup /var/system.log ...\n")
+printWhite("cleanup /var/system.log ...\n")
 //TBD: check if system.log is there, if not inform user to create an empty system.log
 localShell.scp(pathTemp + "/system.log", "/var/", remoteShell) // DOWNLOAD
 
