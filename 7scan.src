@@ -3,11 +3,15 @@ cryptools = include_lib("/lib/crypto.so")
 if not cryptools then exit("Error: Missing crypto library")
 if params.len == 0 or params.len > 1 or params[0] == "-h" or params[0] == "--help" then exit("<b>Usage: 7scan [ip address]</b>")
 
-getSMT=function(ip, port)
-  printWhite("running smtp_user_list ...")
+PrintYellow=function(string); print("<color=yellow>" + string + "</color>"); end function
+PrintWhite=function(string); print("<color=white>" + string + "</color>"); end function
+PrintRed=function(string); print("<color=red>" + string + "</color>"); end function
+
+GetSMTP=function(ip, port)
+  PrintWhite("running smtp_user_list ...")
   users = cryptools.smtp_user_list(ipAddress, 25)
   if(typeof(users) == "string") then
-    printRed(users)
+    PrintRed(users)
   else
     for user in users
       userPass = user.split(" ")
@@ -16,28 +20,16 @@ getSMT=function(ip, port)
   end if
 end function
 
-printYellow = function(string)
-  print("<color=yellow>" + string + "</color>")
-end function
-
-printWhite = function(string)
-  print("<color=white>" + string + "</color>")
-end function
-
-printRed = function(message)
-  print("<color=red><b>" + message + "</b></color>")
-end function
-
 // nmap
 if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")
 if not is_valid_ip(params[0]) then exit("nmap: invalid ip address")
 if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 ipAddress = params[0]
 clear_screen
-printYellow("running /bin/7scan")
+PrintYellow("running /bin/7scan")
 print("checking IP: " + ipAddress)
 
-printWhite("running nmap ...")
+PrintWhite("running nmap ...")
 isLanIp = is_lan_ip( ipAddress )
 if isLanIp then
    router = get_router;
@@ -45,7 +37,7 @@ else
    router = get_router( ipAddress )
 end if
 
-if router == null then printRed("nmap: ip address not found")
+if router == null then PrintRed("nmap: ip address not found")
 ports = null
 
 if not isLanIp then
@@ -54,9 +46,9 @@ else
    ports = router.device_ports(ipAddress)
 end if
 
-if ports == null then printRed("nmap: ip address not found")
+if ports == null then PrintRed("nmap: ip address not found")
 if typeof(ports) == "string" then exit(ports)
-if(ports.len == 0) then printRed("nmap: No open ports found")
+if(ports.len == 0) then PrintRed("nmap: No open ports found")
 
 nmapInfo = ""
 for port in ports
@@ -72,16 +64,16 @@ for port in ports
     nmapInfo = port.port_number + " " + port_status + " " + service_info + " " + lan_ips
   else
     nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
-    if service_info == "" then getSMT(ipAddress, port.port_number)
+    if service_info == "" then GetSMTP(ipAddress, port.port_number)
   end if
 end for
 if nmapInfo != "" then print(format_columns(nmapInfo))
 
 // scanrouter
-printWhite("running scanrouter ...")
+PrintWhite("running scanrouter ...")
 router = get_router( ipAddress )
 if router == null then
-  printRed("scanrouter: ip address not found")
+  PrintRed("scanrouter: ip address not found")
 else
   version = router.kernel_version
   if not version then
@@ -91,7 +83,7 @@ else
   end if
 
   firewall_rules = router.firewall_rules
-  if typeof(firewall_rules) == "string" then printRed(firewall_rules)
+  if typeof(firewall_rules) == "string" then PrintRed(firewall_rules)
   if firewall_rules.len == 0 then
     print("No firewall rules found!")
   else
@@ -104,9 +96,9 @@ else
 end if
 
 //whois
-printWhite("running whois ...")
+PrintWhite("running whois ...")
 if whois(ipAddress) == "Error: the IP address must be public" then
-  printRed("whois: the IP address must be public")
+  PrintRed("whois: the IP address must be public")
 else
   print(whois(ipAddress))
 end if
