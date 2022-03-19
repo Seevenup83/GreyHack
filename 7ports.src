@@ -5,19 +5,22 @@ serviceVersion = params[1] // version of the service your are searching for. exa
 
 if serviceName == "x" and serviceVersion == "x" then verbose = true else verbose = false
 
-createIp=function()
+PrintYellow=function(string); print("<color=yellow>" + string + "</color>"); end function
+PrintWhite=function(string); print("<color=white>" + string + "</color>"); end function
+
+CreateIp=function()
     n=function();return floor((rnd * 255) + 0);end function
     a=function();return floor((rnd * 255) + 1);end function
     ipv4=[a,n,n,n].join(".")
-    if not is_valid_ip(ipv4) then return createIp()
+    if not is_valid_ip(ipv4) then return CreateIp()
     router=get_router(ipv4)
-    if typeof(router) != "router" then return createIp()
-    if router == null then return createIp()
-    if typeof(router.used_ports) != "list" then return createIp()
+    if typeof(router) != "router" then return CreateIp()
+    if router == null then return CreateIp()
+    if typeof(router.used_ports) != "list" then return CreateIp()
     return ipv4
 end function
 
-openPorts=function(ipAddr)
+OpenPorts=function(ipAddr)
   router = get_router(ipAddr)
   ports = router.used_ports
   if ports == null then return false
@@ -30,18 +33,10 @@ openPorts=function(ipAddr)
   end for
 end function
 
-printYellow = function(string)
-  print("<color=yellow>" + string + "</color>")
-end function
-
-printWhite = function(string)
-  print("<color=white>" + string + "</color>")
-end function
-
 clear_screen
-printYellow("running /bin/7ports")
-printWhite("start searching for service: " + serviceName + " with version: " + serviceVersion + " ...")
+PrintYellow("running /bin/7ports")
+PrintWhite("start searching for service: " + serviceName + " with version: " + serviceVersion + " ...")
 while true
-  ipAddress = createIp
-  openPorts(ipAddress)
+  ipAddress = CreateIp
+  OpenPorts(ipAddress)
 end while
