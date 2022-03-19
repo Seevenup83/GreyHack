@@ -1,5 +1,7 @@
-// 7attack
-if params.len != 2 then exit("<b>Usage: 7attack [serviceName] [serviceVersion]</b>\nServiceName: http / ssh / ftp / bank_account / smtp")
+// 7attack (search for open ports for given service and version)
+if params.len < 2 or params.len > 3 then exit("<b>Usage: 7attack [serviceName] [serviceVersion] [(opt) -v]</b>\nServiceName: http / ssh / ftp / bank_account / smtp")
+if params.len == 3 then verbose = true
+
 serviceName = params[0] // service you want to search for. example "ssh"
 serviceVersion = params[1] // version of the service your are searching for. example "1.0.0"
 
@@ -22,8 +24,8 @@ openPorts=function(ipAddr)
   if ports == null then return false
   for port in ports
     service_info = router.port_info(port).split(" ")
-    if not port.is_closed then print(ipAddr + ": " + service_info[0] + " " + service_info[1] + " " + port.port_number) // if you want to see all open ports no matter what service and version, uncomment this line
-    if (not port.is_closed) and (service_info[0] == serviceName) and (service_info[1] == serviceVersion) then print(ipAddr + ": " + service_info[0] + " " + service_info[1] + " " + port.port_number)
+    if (verbose == true) and (not port.is_closed) then print(ipAddr + ": " + service_info[0] + " " + service_info[1] + " " + port.port_number) // if you want to see all open ports use -v option
+    if (not port.is_closed) and (service_info[0] == serviceName) and (service_info[1] == serviceVersion) then print("<color=yellow>" + ipAddr + ": " + service_info[0] + " " + service_info[1] + " " + port.port_number + "</color>")
   end for
 end function
 
