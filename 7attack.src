@@ -1,0 +1,35 @@
+// 7attack
+if params.len != 2 then exit("<b>Usage: 7attack [serviceName] [serviceVersion]</b>\nServiceName: http / ssh / ftp / bank_account / smtp")
+serviceName = params[0] // service you want to search for. example "ssh"
+serviceVersion = params[1] // version of the service your are searching for. example "1.0.0"
+
+createIp=function()
+    n=function();return floor((rnd * 255) + 0);end function
+    a=function();return floor((rnd * 255) + 1);end function
+    ipv4=[a,n,n,n].join(".")
+    if not is_valid_ip(ipv4) then return createIp()
+    router=get_router(ipv4)
+    if typeof(router) != "router" then return createIp()
+    if router == null then return createIp()
+    if typeof(router.used_ports) != "list" then return createIp()
+    return ipv4
+end function
+
+openPorts=function(ipAddr)
+//  print("checking IP: " + ipAddr) // if you like some output about whats going on, uncomment this line
+  router = get_router(ipAddr)
+  ports = router.used_ports
+  if ports == null then return false
+  for port in ports
+    service_info = router.port_info(port).split(" ")
+    if not port.is_closed then print(ipAddr + ": " + service_info[0] + " " + service_info[1] + " " + port.port_number) // if you want to see all open ports no matter what service and version, uncomment this line
+    if (not port.is_closed) and (service_info[0] == serviceName) and (service_info[1] == serviceVersion) then print(ipAddr + ": " + service_info[0] + " " + service_info[1] + " " + port.port_number)
+  end for
+end function
+
+clear_screen
+print("start searching for open " + serviceName + " (" + serviceVersion + ") ports ...")
+while true
+  ipAddress = createIp
+  openPorts(ipAddress)
+end while
