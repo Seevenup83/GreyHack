@@ -1,0 +1,47 @@
+// 7ports (search for open ports for given service and version)
+if params.len != 2 then exit("<b>Usage: 7ports [serviceName] [serviceVersion]</b>\nExample: '7ports ssh x' will show all open ssh ports\nServiceNames: http / ssh / ftp / smtp / bank_account / repository")
+serviceName = params[0] // service you want to search for. example "ssh"
+serviceVersion = params[1] // version of the service your are searching for. example "1.0.0"
+
+if serviceName == "x" and serviceVersion == "x" then verbose = true else verbose = false
+
+createIp=function()
+    n=function();return floor((rnd * 255) + 0);end function
+    a=function();return floor((rnd * 255) + 1);end function
+    ipv4=[a,n,n,n].join(".")
+    if not is_valid_ip(ipv4) then return createIp()
+    router=get_router(ipv4)
+    if typeof(router) != "router" then return createIp()
+    if router == null then return createIp()
+    if typeof(router.used_ports) != "list" then return createIp()
+    return ipv4
+end function
+
+openPorts=function(ipAddr)
+  router = get_router(ipAddr)
+  ports = router.used_ports
+  if ports == null then return false
+  for port in ports
+    service_info = router.port_info(port).split(" ")
+    if (service_info[0] == serviceName) and (service_info[1] == serviceVersion) and (not port.is_closed) then print("<color=yellow>" + ipAddr + " " + service_info[0] + " (" + service_info[1] + ") " + port.port_number + "</color>")
+    if (service_info[0] == serviceName) and (serviceVersion == "x") and (not port.is_closed) then print(ipAddr + " <color=yellow>" + service_info[0] + "</color> (" + service_info[1] + ") " + port.port_number + "</color>")
+    if (serviceName == "x") and (service_info[1] == serviceVersion) and (not port.is_closed) then print(ipAddr + " " + service_info[0] + " (<color=yellow>" + service_info[1] + "</color>) " + port.port_number + "</color>")
+    if (verbose == true) and (not port.is_closed) then print(ipAddr + ": " + service_info[0] + " (" + service_info[1] + ") " + port.port_number)
+  end for
+end function
+
+printYellow = function(string)
+  print("<color=yellow>" + string + "</color>")
+end function
+
+printWhite = function(string)
+  print("<color=white>" + string + "</color>")
+end function
+
+clear_screen
+printYellow("running /bin/7ports")
+printWhite("start searching for service: " + serviceName + " with version: " + serviceVersion + " ...")
+while true
+  ipAddress = createIp
+  openPorts(ipAddress)
+end while

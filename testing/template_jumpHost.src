@@ -1,0 +1,11 @@
+jumpServer = "xxxxxxx"; portJump = 99
+endServer = "xxxxxxx"; portEnd = 22
+shellJump = get_shell.connect_service(jumpServer, portJump, "root", "xxxxxx", "ssh")
+if typeof(shellJump) == "string" then exit(shellJump)
+if shellJump then
+	shellEnd = shellJump.connect_service(endServer, portEnd, "root", "xxxxx", "ssh")
+    shellEnd.start_terminal
+    //shellEnd.launch("/bin/rshell_interface")
+else
+    exit("connection failed")
+end if
