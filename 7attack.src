@@ -1,6 +1,6 @@
 // 7attack (search for open ports for given service and version)
-if params.len < 2 or params.len > 3 then exit("<b>Usage: 7attack [serviceName] [serviceVersion] [(opt) -v]</b>\nServiceName: http / ssh / ftp / bank_account / smtp")
-if params.len == 3 then verbose = true
+if params.len < 2 or params.len > 3 then exit("<b>Usage: 7attack [serviceName] [serviceVersion] [(opt) -v]</b>\nServiceName: http / ssh / ftp / smtp / bank_account / repository")
+if params.len == 3 then verbose = true else verbose = false
 
 serviceName = params[0] // service you want to search for. example "ssh"
 serviceVersion = params[1] // version of the service your are searching for. example "1.0.0"
