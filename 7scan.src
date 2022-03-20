@@ -10,9 +10,9 @@ PrintRed=function(string); print("<color=red>" + string + "</color>"); end funct
 GetSMTP=function(ipAddress, port)
   PrintWhite("running smtp_user_list on port " + port + " ...")
   users = cryptools.smtp_user_list(ipAddress, port)
-  if(typeof(users) != "string") then
+  if(typeof(users) == "list") then
     for user in users
-      userPass = user.sprlit(" ")
+      userPass = user.split(" ")
       print(userPass[0])
     end for
   end if
@@ -57,7 +57,7 @@ for port in ports
      port_status = "closed"
   end if
 
-  if not port.is_closed and service_info.split(" ")[0] == "smtp" then GetSMTP(ipAddress, port.port_number)
+  if (not port.is_closed) and (service_info.split(" ")[0] == "smtp") then GetSMTP(ipAddress, port.port_number)
   if nmapInfo == "" then
     nmapInfo = port.port_number + " " + port_status + " " + service_info + " " + lan_ips
   else
