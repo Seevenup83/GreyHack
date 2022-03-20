@@ -10,6 +10,7 @@ localComputer = localShell.host_computer
 PrintYellow=function(string); print("<color=yellow>" + string + "</color>"); end function
 PrintWhite=function(string); print("<color=white>" + string + "</color>"); end function
 PrintRed=function(string); print("<color=red>" + string + "</color>"); end function
+
 GetPassword=function(userPass)
   if userPass.len != 2 then
     return null
@@ -29,7 +30,7 @@ CheckPasswd=function(file)
     userPass = line.split(":")
     if userPass[0] == "root" then
       password = GetPassword(userPass)
-      if password then localShell.launch("/bin/7ssh", "root@" + password + " " + ipAddress + " " + port)
+      if password then localShell.launch("/bin/7ssh", "root@" + password + " " + ipAddress + " " + port) // script you want to start
     end if
   end for
 end function
@@ -48,12 +49,17 @@ FileExploid=function(result)
   end if
 end function
 
+StringCheck=function(bufferString) // check string if we got router kernel name or version (we dont want it as bufferString)
+  if (bufferString.split(".so").len == 2) or (bufferString.split(".").len == 3) then return false
+end function
+
 AccessPasswdFile=function(result)
   files = result.get_files
   for file in files
     if file.name == "passwd" then CheckPasswd(file)
   end for
 end function
+
 
 PrintYellow("running: /bin/7attack " + ipAddress + " " + port)
 PrintWhite("scanning libs ...\n")
@@ -64,8 +70,10 @@ for memoryZone in memoryZones
   unsafeChecks = metaxploit.scan_address(metaLib, memoryZone)
   for unsafeCheck in unsafeChecks.split("<b>")[1:unsafeChecks.len]
 	bufferString = unsafeCheck.split("</b>")[0]
-    PrintWhite("trying: memoryZone: " + memoryZone + " bufferString: " + bufferString + " ...")
-	result = metaLib.overflow(memoryZone, bufferString)
+    if StringCheck(bufferString) != "0" then
+      PrintWhite("trying: memoryZone: " + memoryZone + " bufferString: " + bufferString + " ...")
+      result = metaLib.overflow(memoryZone, bufferString)
+    end if
 	if result and result != null then
       if typeof(result) == "shell" then CheckPasswd(result.host_computer.File("/etc/passwd"))
       if typeof(result) == "file" then FileExploid(result)
