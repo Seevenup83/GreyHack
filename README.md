@@ -126,7 +126,8 @@ Processing...
 > Usage: 7attack [ip-ipAddress] [port]
 
 This script needs 7ssh.src (/bin/7ssh) to work as planed!
-If you plan to run an other command after you got the remote root password you need to change this part of the line:
+If you plan to run an other command after you got the remote root password you need to change this part of the line
+For exmaple if you only want a root shell on the remote. Change /bin/7ssh to /bin/ssh here:
 ```
 localShell.launch("/bin/7ssh", "root@" + password + " " + ipAddress + " " + port) // script you want to start
 ```
