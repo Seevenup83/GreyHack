@@ -12,7 +12,7 @@ GetSMTP=function(ipAddress, port)
   users = cryptools.smtp_user_list(ipAddress, port)
   if(typeof(users) != "string") then
     for user in users
-      userPass = user.split(" ")
+      userPass = user.sprlit(" ")
       print(userPass[0])
     end for
   end if
@@ -23,17 +23,16 @@ if params.len != 1 then exit("<b>Usage: 7scan [ip address]</b>")
 if not is_valid_ip(params[0]) then exit("nmap: invalid ip address")
 if not get_shell.host_computer.is_network_active then exit("nmap: No internet access.")
 ipAddress = params[0]
-clear_screen
-PrintYellow("running /bin/7scan")
-print("checking IP: " + ipAddress)
-
-PrintWhite("running nmap ...")
 isLanIp = is_lan_ip( ipAddress )
 if isLanIp then
    router = get_router;
 else
    router = get_router( ipAddress )
 end if
+
+clear_screen
+PrintYellow("running /bin/7scan")
+print("checking IP: " + ipAddress)
 
 if router == null then PrintRed("nmap: ip address not found")
 ports = null
@@ -65,6 +64,7 @@ for port in ports
     nmapInfo = nmapInfo + "\n" + port.port_number + " " + port_status + " " + service_info + " " + lan_ips
   end if
 end for
+PrintWhite("running nmap ...")
 if nmapInfo != "" then print(format_columns(nmapInfo))
 
 // scanrouter
