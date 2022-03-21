@@ -83,12 +83,12 @@ This script is not fully automated!! (Read description below)
 - script connects to the remote server, deciphers all banks informations and stores them on your server. DEFAULT: /home/[user]/Downloads/cracked/bank_informations
 - It also install a rshell-backdoor, if configured right. This part is not automated, so you need to have the rshellbackdoor.src on the right place DEFAULT: /home/[user]/Downloads/rshellbackdoor
 SEE: template/rshellbackdoor.src (works only if an rshellServer is installed in the same network as you run the script, never use it on homeComputer!!)
-- at the end it copys an empty system.log to the remote to remove all traces, you need an empty system.log in DEFAULT: /home/[user]/Downloads/system.log
+- at the end it copys an system.log to the remote to remove all traces, you need an empty system.log in DEFAULT: /home/[user]/Downloads/system.log
 
 The script has 2 other functions which are disabled cause of no need for me.
 - GetPasswd: stores passwords in: /home/[user]/Downloads/cracked/passwd_[ipaddress]
 - GetLibs: BUG: you need to make a folder in  /home/[user]/Downloads/libs (no time to fix it at the moment)
-```
+```lua
 // START function(s) you want to use
 //GetPasswd() // get all passwd passwords
 GetBank() // get all bank passwords
@@ -133,7 +133,7 @@ it then gets the root password, and starts /bin/7ssh to get all the needed infor
 This script needs 7ssh.src (/bin/7ssh) to work as planed!
 If you plan to run an other command after you got the remote root password you need to change this part of the line
 For exmaple if you only want a root shell on the remote. Change /bin/7ssh to /bin/ssh here:
-```
+```lua
 localShell.launch("/bin/7ssh", "root@" + password + " " + ipAddress + " " + port) // script you want to start
 ```
 
@@ -141,12 +141,12 @@ INFO: ``` error: can't change password for user ***. Passwords must be alphanume
 i dont use the exploid to set a new password for a random user, since i cant read the username where the password is set, and there for i cant use this exploid in combination with 7ssh.
 you can set a password, but if doing this, this will end the attack, cause it was successful and in wont try all other exploids.
 
-```
+```lua
 result = metaLib.overflow(memoryZone, bufferString)
 ```
 
 to:
-```
+```lua
 result = metaLib.overflow(memoryZone, bufferString, "new password here")
 ```
 
