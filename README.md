@@ -125,6 +125,9 @@ Processing...
 ## 7attack.src
 > Usage: 7attack [ip-ipAddress] [port]
 
+This Script scans the port for exploids and trys them all till one works.
+it then gets the root password, and starts /bin/7ssh to get all the needed informations.
+
 This script needs 7ssh.src (/bin/7ssh) to work as planed!
 If you plan to run an other command after you got the remote root password you need to change this part of the line
 For exmaple if you only want a root shell on the remote. Change /bin/7ssh to /bin/ssh here:
@@ -144,10 +147,6 @@ to:
 ```
 result = metaLib.overflow(memoryZone, bufferString, "new password here")
 ```
-
-
-This Script scans the port for exploids and trys them all till one works.
-it then gets the root password, and starts /bin/7ssh to get all the needed informations.
 
 Example with 7ssh installed:
 ```
