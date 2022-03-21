@@ -5,8 +5,8 @@
 > Usage: 7scan [ip address]
 
 This script will show you all information for the given ipAddress
-```
-running /bin/7scan
+```html
+<font color="yellow">running /bin/7scan</font>
 checking IP: 159.38.210.37
 running smtp_user_list on port 25 ...
 root
