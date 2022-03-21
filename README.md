@@ -5,6 +5,17 @@
 > Usage: 7scan [ip address]
 
 This script will show you all information for the given ipAddress
+
+```diff
+- text in red
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold)@@
+```
+
+
+
 ```
 running /bin/7scan
 checking IP: 159.38.210.37
@@ -129,8 +140,7 @@ Processing...
 > Usage: 7attack [ip-ipAddress] [port]
 
 - [ ] BUG: if 7ssh is not installed it keeps going (loop) -> TBD: inform user and exit
-- [ ] BUG: if systemlog is not installed it keeps going (loop) -> TBD: inform user and exit
-
+- [ ] BUG: if system.log is not on right place it keeps going (loop) -> TBD: inform user and exit
 
 This Script scans the port for exploids and trys them all till one works.
 it then gets the root password, and starts /bin/7ssh to get all the needed informations.
