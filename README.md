@@ -1,7 +1,7 @@
 # GreyHack Script
 > Collection if scripts for the game GreyHack (Steam)
 
-## 7scan.src
+## [7scan.src](7scan.src)
 > Usage: 7scan [ip address]
 
 This script will show you all information for the given ipAddress
@@ -82,7 +82,7 @@ start searching for service: ssh with version: x ...
 This script is not fully automated!! (Read description below)
 - script connects to the remote server, deciphers all banks informations and stores them on your server. DEFAULT: /home/[user]/Downloads/cracked/bank_informations
 - It also install a rshell-backdoor, if configured right. This part is not automated, so you need to have the rshellbackdoor.src on the right place DEFAULT: /home/[user]/Downloads/rshellbackdoor
-SEE: template/rshellbackdoor.src (works only if an rshellServer is installed in the same network as you run the script, never use it on homeComputer!!)
+SEE: [template\rshellbackdoor.src](template\rshellbackdoor.src) (works only if an rshellServer is installed in the same network as you run the script, never use it on homeComputer!!)
 - at the end it copys an system.log to the remote to remove all traces, you need an empty system.log in DEFAULT: /home/[user]/Downloads/system.log
 
 The script has 2 other functions which are disabled cause of no need for me.
