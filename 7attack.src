@@ -49,17 +49,12 @@ FileExploid=function(result)
   end if
 end function
 
-StringCheck=function(bufferString) // check string if we got router kernel name or version (we dont want it as bufferString)
-  if (bufferString.split(".so").len == 2) or (bufferString.split(".").len == 3) then return false
-end function
-
 AccessPasswdFile=function(result)
   files = result.get_files
   for file in files
     if file.name == "passwd" then CheckPasswd(file)
   end for
 end function
-
 
 PrintYellow("running: /bin/7attack " + ipAddress + " " + port)
 PrintWhite("scanning libs ...\n")
@@ -70,7 +65,7 @@ for memoryZone in memoryZones
   unsafeChecks = metaxploit.scan_address(metaLib, memoryZone)
   for unsafeCheck in unsafeChecks.split("<b>")[1:unsafeChecks.len]
 	bufferString = unsafeCheck.split("</b>")[0]
-    if StringCheck(bufferString) != "0" then
+    if (bufferString.split(".so").len != 2) or (bufferString.split(".").len != 3) then
       PrintWhite("trying: memoryZone: " + memoryZone + " bufferString: " + bufferString + " ...")
       result = metaLib.overflow(memoryZone, bufferString)
     end if
