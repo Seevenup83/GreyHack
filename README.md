@@ -141,12 +141,12 @@ INFO: ``` error: can't change password for user ***. Passwords must be alphanume
 i dont use the exploid to set a new password for a random user, since i cant read the username where the password is set, and there for i cant use this exploid in combination with 7ssh.
 you can set a password, but if doing this, this will end the attack, cause it was successful and in wont try all other exploids.
 
-```lua
+```rust
 result = metaLib.overflow(memoryZone, bufferString)
 ```
 
 to:
-```lua
+```rust
 result = metaLib.overflow(memoryZone, bufferString, "new password here")
 ```
 
