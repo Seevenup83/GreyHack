@@ -1,5 +1,5 @@
 # GreyHack Script
-> Collection if scripts for the game GreyHack (Steam)
+Collection of scripts for the game GreyHack (Steam)
 
 ## [7scan.src](7scan.src)
 > Usage: 7scan [ip address]
