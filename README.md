@@ -88,7 +88,7 @@ SEE: template/rshellbackdoor.src (works only if an rshellServer is installed in 
 The script has 2 other functions which are disabled cause of no need for me.
 - GetPasswd: stores passwords in: /home/[user]/Downloads/cracked/passwd_[ipaddress]
 - GetLibs: BUG: you need to make a folder in  /home/[user]/Downloads/libs (no time to fix it at the moment)
-```lua
+```rust
 // START function(s) you want to use
 //GetPasswd() // get all passwd passwords
 GetBank() // get all bank passwords
