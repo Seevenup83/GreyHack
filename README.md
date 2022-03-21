@@ -6,7 +6,7 @@
 
 This script will show you all information for the given ipAddress
 ```html
-<font color="yellow">running /bin/7scan</font>
+<p style="color:green;">running /bin/7scan</p>
 checking IP: 159.38.210.37
 running smtp_user_list on port 25 ...
 root
