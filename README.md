@@ -37,7 +37,7 @@ user: root password: secretword
 
 ## 7ports.src
 > Usage: 7ports [serviceName] [serviceVersion]
-ServiceNames: http / ssh / ftp / smtp / bank_account / repository
+> ServiceNames: http / ssh / ftp / smtp / bank_account / repository
 
 This script generates valid ipAddresses where given port or version is open (or all)
 Example to search for any open ports
@@ -79,7 +79,7 @@ start searching for service: ssh with version: x ...
 ## 7ssh.src
 > Usage: 7ssh [user@password] [ip address] [(opt) port]
 
-This script is not fully automated!!
+This script is not fully automated!! (Read description below)
 - script connects to the remote server, deciphers all banks informations and stores them on your server. DEFAULT: /home/[user]/Downloads/cracked/bank_informations
 - It also install a rshell-backdoor, if configured right. This part is not automated, so you need to have the rshellbackdoor.src on the right place DEFAULT: /home/[user]/Downloads/rshellbackdoor
 SEE: template/rshellbackdoor.src (works only if an rshellServer is installed in the same network as you run the script, never use it on homeComputer!!)
@@ -132,8 +132,22 @@ For exmaple if you only want a root shell on the remote. Change /bin/7ssh to /bi
 localShell.launch("/bin/7ssh", "root@" + password + " " + ipAddress + " " + port) // script you want to start
 ```
 
+INFO: ``` error: can't change password for user ***. Passwords must be alphanumeric.```
+i dont use the exploid to set a new password for a random user, since i cant read the username where the password is set, and there for i cant use this exploid in combination with 7ssh.
+you can set a password, but if doing this, this will end the attack, cause it was successful and in wont try all other exploids.
+
+```
+result = metaLib.overflow(memoryZone, bufferString)
+```
+
+to:
+```
+result = metaLib.overflow(memoryZone, bufferString, "new password here")
+```
+
+
 This Script scans the port for exploids and trys them all till one works.
-it then gets the root password, and starts /bin/7ssh to get all the needed informations
+it then gets the root password, and starts /bin/7ssh to get all the needed informations.
 
 Example with 7ssh installed:
 ```
