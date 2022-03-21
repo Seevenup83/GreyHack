@@ -5,17 +5,6 @@
 > Usage: 7scan [ip address]
 
 This script will show you all information for the given ipAddress
-
-```diff
-- text in red
-+ text in green
-! text in orange
-# text in gray
-@@ text in purple (and bold)@@
-```
-
-
-
 ```
 running /bin/7scan
 checking IP: 159.38.210.37
