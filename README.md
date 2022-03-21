@@ -125,6 +125,8 @@ Processing...
 ## 7attack.src
 > Usage: 7attack [ip-ipAddress] [port]
 
+OPEN BUG: if 7ssh is not installed it keeps going (loop) -> TBD: inform user and exit
+
 This Script scans the port for exploids and trys them all till one works.
 it then gets the root password, and starts /bin/7ssh to get all the needed informations.
 
