@@ -25,7 +25,7 @@ Administrative contact: Allianora Tmard
 Email address: Tmard@ressono.org
 Phone: 342558625
 ```
-## 7fastdecipher.src
+## [7fastdecipher.src](7fastdecipher.src)
 > Usage: 7fastdecipher [user:password]
 
 With this small script, you can decipher one password
@@ -35,7 +35,7 @@ With this small script, you can decipher one password
 user: root password: secretword
 ```
 
-## 7ports.src
+## [7ports.src](7ports.src)
 > Usage: 7ports [serviceName] [serviceVersion]
 > ServiceNames: http / ssh / ftp / smtp / bank_account / repository
 
@@ -76,13 +76,13 @@ start searching for service: ssh with version: x ...
 220.93.182.47 ssh (2.2.6) 31820
 ```
 
-## 7ssh.src
+## [7ssh.src](7ssh.src)
 > Usage: 7ssh [user@password] [ip address] [(opt) port]
 
 This script is not fully automated!! (Read description below)
 - script connects to the remote server, deciphers all banks informations and stores them on your server. DEFAULT: /home/[user]/Downloads/cracked/bank_informations
-- It also install a rshell-backdoor, if configured right. This part is not automated, so you need to have the rshellbackdoor.src on the right place DEFAULT: /home/[user]/Downloads/rshellbackdoor
-SEE: [template\rshellbackdoor.src](template\rshellbackdoor.src) (works only if an rshellServer is installed in the same network as you run the script, never use it on homeComputer!!)
+- It also install a rshell-backdoor, if configured right. This part is not automated, so you need to have the [template/rshellbackdoor.src](rshellbackdoor.src) on the right place DEFAULT: /home/[user]/Downloads/rshellbackdoor
+SEE: [template/rshellbackdoor.src](template/rshellbackdoor.src) (works only if an rshellServer is installed in the same network as you run the script, never use it on homeComputer!!)
 - at the end it copys an system.log to the remote to remove all traces, you need an empty system.log in DEFAULT: /home/[user]/Downloads/system.log
 
 The script has 2 other functions which are disabled cause of no need for me.
@@ -122,7 +122,7 @@ Processing...
 ... connection to 220.93.182.47 closed
 ```
 
-## 7attack.src
+## [7attack.src](7attack.src)
 > Usage: 7attack [ip-ipAddress] [port]
 
 OPEN BUG: if 7ssh is not installed it keeps going (loop) -> TBD: inform user and exit
